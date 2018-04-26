@@ -8,5 +8,5 @@
 ```shell
 java -Xmx128m --add-modules=jdk.incubator.httpclient -Dlog4j.configurationFile=log4j2.xml -jar target/rkn-list-uploader-1.0-SNAPSHOT.jar -ra 192.168.1.1 -p 8728 -l admin -pw password
 ```
-Дополнительную помощь по ключам запуска можно увидеть, использовав ключ `-h` или `--help`.
+Дополнительную помощь по ключам запуска можно увидеть, использовав ключ `-h` или `--help`.  
 Пример конфигурационного файла `log4j2.xml` можно найти в корне проекта.
