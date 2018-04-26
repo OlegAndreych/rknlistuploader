@@ -3,18 +3,20 @@ package ru.andreych.rkn.list.uploader.mikrotik;
 import me.legrange.mikrotik.ApiConnection;
 import me.legrange.mikrotik.MikrotikApiException;
 
+import javax.net.SocketFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static me.legrange.mikrotik.ApiConnection.DEFAULT_COMMAND_TIMEOUT;
 
 public class MikrotikConnector implements AutoCloseable {
 
     private final ApiConnection connection;
 
-    public MikrotikConnector(String address, String login, String password) throws MikrotikApiException {
-        final ApiConnection connection = ApiConnection.connect(address);
+    public MikrotikConnector(String address, int port, String login, String password) throws MikrotikApiException {
+        final ApiConnection connection = ApiConnection.connect(SocketFactory.getDefault(), address, port, DEFAULT_COMMAND_TIMEOUT);
         connection.login(login, password);
         this.connection = connection;
     }

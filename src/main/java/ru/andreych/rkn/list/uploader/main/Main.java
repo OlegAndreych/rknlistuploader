@@ -18,14 +18,27 @@ public class Main {
 
         final var parsedArgs = new Args();
 
-        JCommander.newBuilder()
+        final JCommander jCommander = JCommander.newBuilder()
                 .addObject(parsedArgs)
-                .build()
+                .programName("rknlistuploader")
+                .build();
+
+        jCommander
                 .parse(args);
+
+        if (parsedArgs.isHelp()) {
+            jCommander.usage();
+            return;
+        }
 
         LOG.debug(parsedArgs);
 
-        try (final MikrotikConnector mikrotikConnector = new MikrotikConnector(parsedArgs.getRouterAddress(), parsedArgs.getLogin(), parsedArgs.getPassword())) {
+        try (final MikrotikConnector mikrotikConnector = new MikrotikConnector(
+                parsedArgs.getRouterAddress(),
+                parsedArgs.getPort(),
+                parsedArgs.getLogin(),
+                parsedArgs.getPassword())) {
+
             final List<Map<String, String>> listContent = mikrotikConnector.getListContent(parsedArgs.getListName());
 
             LOG.debug(listContent);
