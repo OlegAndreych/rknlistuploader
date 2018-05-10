@@ -37,7 +37,8 @@ public class Main {
                 parsedArgs.getRouterAddress(),
                 parsedArgs.getPort(),
                 parsedArgs.getLogin(),
-                parsedArgs.getPassword())) {
+                parsedArgs.getPassword(),
+                parsedArgs.getMikrotikTimeout())) {
 
             final List<Map<String, String>> listContent = mikrotikConnector.getListContent(parsedArgs.getListName());
 

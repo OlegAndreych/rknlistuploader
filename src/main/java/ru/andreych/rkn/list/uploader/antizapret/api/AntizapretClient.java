@@ -22,7 +22,6 @@ import static java.util.stream.Collectors.toSet;
 
 public class AntizapretClient {
 
-    private final static Logger LOG = LogManager.getLogger();
     private static final Pattern subnetRegex = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}(\\/\\d{1,2})?");
 
     private final HttpRequest.Builder template;

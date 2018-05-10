@@ -15,8 +15,9 @@ public class MikrotikConnector implements AutoCloseable {
 
     private final ApiConnection connection;
 
-    public MikrotikConnector(String address, int port, String login, String password) throws MikrotikApiException {
+    public MikrotikConnector(String address, int port, String login, String password, int timeout) throws MikrotikApiException {
         final ApiConnection connection = ApiConnection.connect(SocketFactory.getDefault(), address, port, DEFAULT_COMMAND_TIMEOUT);
+        connection.setTimeout(timeout);
         connection.login(login, password);
         this.connection = connection;
     }

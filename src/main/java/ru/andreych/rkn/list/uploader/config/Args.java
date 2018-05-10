@@ -15,6 +15,8 @@ public class Args {
     private String listName = "rkn";
     @Parameter(names = {"--apiUri", "-u"}, description = "Antizapret API url")
     private String apiUrl = "http://api.antizapret.info/group.php";
+    @Parameter(names = {"--mikrotikTimeout", "-mt"}, description = "Mikrotik synchronous command timeout")
+    private int mikrotikTimeout = 300_000;
     @Parameter(names = {"-h", "--help"}, help = true, description = "Usage description")
     private boolean help;
 
@@ -62,5 +64,9 @@ public class Args {
                 ", listName='" + listName + '\'' +
                 ", apiUrl='" + apiUrl + '\'' +
                 '}';
+    }
+
+    public int getMikrotikTimeout() {
+        return mikrotikTimeout;
     }
 }
