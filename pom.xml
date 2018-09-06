@@ -12,7 +12,7 @@
         <maven.compiler.target>10</maven.compiler.target>
         <maven.compiler.source>10</maven.compiler.source>
 
-        <log4j.version>2.11.0</log4j.version>
+        <log4j.version>2.11.1</log4j.version>
     </properties>
 
     <dependencyManagement>
@@ -20,7 +20,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.2.0-M1</version>
+                <version>5.3.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -28,6 +28,12 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.11.0</version>
+        </dependency>
+
         <dependency>
             <groupId>me.legrange</groupId>
             <artifactId>mikrotik</artifactId>
@@ -70,12 +76,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.7.0</version>
                 <configuration>
-                    <source>10</source>
-                    <target>10</target>
-                    <compilerArgs>
-                        <arg>--add-modules</arg>
-                        <arg>jdk.incubator.httpclient</arg>
-                    </compilerArgs>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
 

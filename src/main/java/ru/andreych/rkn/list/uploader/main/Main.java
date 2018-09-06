@@ -16,7 +16,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        final var parsedArgs = new Args();
+        final Args parsedArgs = new Args();
 
         final JCommander jCommander = JCommander.newBuilder()
                 .addObject(parsedArgs)
