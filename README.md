@@ -3,10 +3,10 @@
 Впоследствие этот список можно использовать для настройки Policy Based Routing для того, чтобы направлять трафик к заблокированным сетям через VPN и не терять в скорости обращения ко всем остальным ресурсам.  
 В качестве источника адресов испрользуется https://antizapret.info/api.php, за что им большое спасибо и можно занести донат.
 
-Для запуска необходима Java 10.  
+Для запуска необходима Java 8.
 Пример команды для запуска:
 ```shell
-java -Xmx128m --add-modules=jdk.incubator.httpclient -Dlog4j.configurationFile=log4j2.xml -jar target/rkn-list-uploader-1.0-SNAPSHOT.jar -ra 192.168.1.1 -p 8728 -l admin -pw password
+java -Dlog4j.configurationFile=log4j2.xml -jar target/rkn-list-uploader-1.0-SNAPSHOT.jar -ra 192.168.1.1 -p 8728 -l admin -pw password
 ```
 Дополнительную помощь по ключам запуска можно увидеть, использовав ключ `-h` или `--help`.  
 Пример конфигурационного файла `log4j2.xml` можно найти в корне проекта.
