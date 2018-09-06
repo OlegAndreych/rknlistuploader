@@ -39,12 +39,14 @@ public class AntizapretClient {
         final Response response = this.client.newCall(this.request).execute();
 
         if (response.body() != null) {
-            return new BufferedReader(new InputStreamReader(response.body().byteStream())).lines()
-                    .flatMap(l -> Arrays.stream(l.split(",")))
-                    .filter(Objects::nonNull)
-                    .filter(i -> !i.isEmpty())
-                    .filter(SUBNET_PREDICATE)
-                    .collect(toSet());
+            try (final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.body().byteStream()))) {
+                return bufferedReader.lines()
+                        .flatMap(l -> Arrays.stream(l.split(",")))
+                        .filter(Objects::nonNull)
+                        .filter(i -> !i.isEmpty())
+                        .filter(SUBNET_PREDICATE)
+                        .collect(toSet());
+            }
         } else {
             LOG.warn("We have an empty response body here.");
             return emptySet();
