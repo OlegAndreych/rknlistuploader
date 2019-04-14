@@ -1,5 +1,7 @@
 package ru.andreych.rkn.list.uploader.antizapret.api;
 
+import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressString;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -35,7 +37,7 @@ public class AntizapretClient {
                 .build();
     }
 
-    public Set<String> getBlockList() throws IOException {
+    public Set<IPAddress> getBlockList() throws IOException {
         final Response response = this.client.newCall(this.request).execute();
 
         if (response.body() != null) {
@@ -44,7 +46,9 @@ public class AntizapretClient {
                         .flatMap(l -> Arrays.stream(l.split(",")))
                         .filter(Objects::nonNull)
                         .filter(i -> !i.isEmpty())
-                        .filter(SUBNET_PREDICATE)
+                        .map(IPAddressString::new)
+                        .filter(IPAddressString::isIPv4)
+                        .map(IPAddressString::getAddress)
                         .collect(toSet());
             }
         } else {
