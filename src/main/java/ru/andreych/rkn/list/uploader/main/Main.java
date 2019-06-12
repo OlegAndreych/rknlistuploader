@@ -12,7 +12,7 @@ import java.util.*;
 
 public class Main {
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LogManager.getLogger(Main.class);
 
     public static void main(final String[] args) throws Exception {
 

@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toSet;
 
 public class AntizapretClient {
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LogManager.getLogger(AntizapretClient.class);
 
     private final OkHttpClient client = new OkHttpClient();
     private final Request request;
@@ -48,9 +48,9 @@ public class AntizapretClient {
                     if (address.isSinglePrefixBlock()) {
                         return address.toPrefixLengthString();
                     } else if (address.isMultiple()) {
-                        return address.getLower().toString() + '-' + address.getUpper().toString();
+                        return address.getLower().getLower().toCanonicalWildcardString() + '-' + address.getUpper().toCanonicalWildcardString();
                     } else {
-                        return address.toString();
+                        return address.toCanonicalWildcardString();
                     }
                 })
                 .collect(toSet());

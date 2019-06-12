@@ -1,36 +1,41 @@
 package ru.andreych.rkn.list.uploader.antizapret.api;
 
 import inet.ipaddr.IPAddress;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.collections4.ListUtils.partition;
 
 public class MergingTask extends RecursiveTask<IPAddress[]> {
 
-    private static final int THRESHOLD = 128;
+    private static final Logger LOG = LogManager.getLogger(MergingTask.class);
+    private static final int THRESHOLD = 100_000;
+    private static final int THREADS = Runtime.getRuntime().availableProcessors();
     private final List<IPAddress> initialBlocks;
 
     public MergingTask(final IPAddress[] initialBlocks) {
         this.initialBlocks = Arrays.asList(initialBlocks);
     }
 
-    public MergingTask(final List<IPAddress> initialBlocks) {
+    private MergingTask(final List<IPAddress> initialBlocks) {
         this.initialBlocks = initialBlocks;
     }
 
     private Collection<MergingTask> createSubtasks() {
-        final ArrayList<MergingTask> subtasks = new ArrayList<>(2);
         final int size = this.initialBlocks.size();
-        final int halfSize = size / 2;
+        final int batchSize = size / THREADS;
 
-        subtasks.add(new MergingTask(this.initialBlocks.subList(0, halfSize)));
-        subtasks.add(new MergingTask(this.initialBlocks.subList(halfSize, size)));
-
-        return subtasks;
+        return partition(this.initialBlocks, batchSize)
+                .stream()
+                .map(MergingTask::new)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -50,8 +55,12 @@ public class MergingTask extends RecursiveTask<IPAddress[]> {
 
     private IPAddress[] process(final IPAddress[] premerged) {
         if (premerged.length > 0) {
-            return premerged[0].mergeToSequentialBlocks(premerged);
+            final IPAddress[] merged = premerged[0].mergeToSequentialBlocks(premerged);
+            LOG.info(() -> "There were " + premerged.length + " blocks before merging. " +
+                    "There is " + merged.length + " blocks after merging.");
+            return merged;
         }
+        LOG.info("There is 0 blocks after merging.");
         return new IPAddress[0];
     }
 }
