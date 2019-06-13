@@ -15,7 +15,7 @@ import static me.legrange.mikrotik.ApiConnection.DEFAULT_COMMAND_TIMEOUT;
 
 public class MikrotikConnector implements AutoCloseable {
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LogManager.getLogger(MikrotikConnector.class);
 
     private final ApiConnection connection;
 
@@ -27,7 +27,7 @@ public class MikrotikConnector implements AutoCloseable {
     }
 
     public List<Map<String, String>> getListContent(final String listName) throws MikrotikApiException {
-        LOG.info("Geting \"{}\" list content.", listName);
+        LOG.info("Getting \"{}\" list content.", listName);
         final List<Map<String, String>> list = this.connection.execute(format("/ip/firewall/address-list/print where list=%s", listName));
         LOG.info("Got \"{}\" list content.", listName);
         return list;
