@@ -1,8 +1,6 @@
 package ru.andreych.rkn.list.uploader.antizapret.api;
 
 import inet.ipaddr.IPAddress;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,8 +13,7 @@ import static org.apache.commons.collections4.ListUtils.partition;
 
 public class MergingTask extends RecursiveTask<IPAddress[]> {
 
-    private static final Logger LOG = LogManager.getLogger(MergingTask.class);
-    private static final int THRESHOLD = 100_000;
+    private static final int THRESHOLD = 10_000;
     private static final int THREADS = Runtime.getRuntime().availableProcessors();
     private final List<IPAddress> initialBlocks;
 
@@ -55,12 +52,8 @@ public class MergingTask extends RecursiveTask<IPAddress[]> {
 
     private IPAddress[] process(final IPAddress[] premerged) {
         if (premerged.length > 0) {
-            final IPAddress[] merged = premerged[0].mergeToSequentialBlocks(premerged);
-            LOG.info(() -> "There were " + premerged.length + " blocks before merging. " +
-                    "There is " + merged.length + " blocks after merging.");
-            return merged;
+            return premerged[0].mergeToSequentialBlocks(premerged);
         }
-        LOG.info("There is 0 blocks after merging.");
         return new IPAddress[0];
     }
 }
