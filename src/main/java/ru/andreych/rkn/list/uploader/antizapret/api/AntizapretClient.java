@@ -1,124 +1,79 @@
 package ru.andreych.rkn.list.uploader.antizapret.api;
 
-import inet.ipaddr.IPAddress;
-import inet.ipaddr.IPAddressString;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
+import okhttp3.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ForkJoinPool;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toSet;
+import static java.util.Arrays.stream;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.stream.Collectors.toList;
 
 public class AntizapretClient {
 
     private static final Logger LOG = LogManager.getLogger(AntizapretClient.class);
 
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client;
     private final Request request;
 
-    public AntizapretClient(final String listAddress) {
+    public AntizapretClient(
+            final String listAddress,
+            final long connectionTimeout,
+            final long readTimeout,
+            final long writeTimeout) {
+
+        this.client = new OkHttpClient.Builder()
+                .connectTimeout(connectionTimeout, MILLISECONDS)
+                .readTimeout(readTimeout, MILLISECONDS)
+                .writeTimeout(writeTimeout, MILLISECONDS)
+                .build();
+
         this.request = new Request.Builder()
                 .url(listAddress)
                 .get()
                 .build();
     }
 
-    public Set<String> getBlockList() throws IOException {
-
-        final IPAddress[] blocks;
+    public List<String> getAddressStrings() throws IOException {
 
         LOG.info("Retrieving raw blocked addresses from Antizapret.");
         try (final Response response = this.client.newCall(this.request).execute()) {
-
-            blocks = this.getBlocks(response);
+            final List<String> addressStrings = this.getAddressStrings(response.body());
+            LOG.info("Retrieved raw blocked addresses from Antizapret.");
+            return addressStrings;
         }
-        return Stream.of(blocks)
-                .map(address -> {
-                    if (address.isSinglePrefixBlock()) {
-                        return address.toPrefixLengthString();
-                    } else if (address.isMultiple()) {
-                        return address.getLower().getLower().toCanonicalWildcardString() + '-' + address.getUpper().toCanonicalWildcardString();
-                    } else {
-                        return address.toCanonicalWildcardString();
-                    }
-                })
-                .collect(toSet());
-
     }
 
-
-    private IPAddress[] getBlocks(final Response response) throws IOException {
-
-        final long start = System.nanoTime();
-
-        final ResponseBody responseBody = response.body();
-        final IPAddress[] blockList = this.getBlockList(responseBody);
-        final int blockListLength = blockList.length;
-
-        LOG.info("Entries before merging: {}.", blockListLength);
-        LOG.info("Merging addresses.");
-
-        final IPAddress[] blocks;
-        if (blockListLength > 0) {
-            /*final IPAddress head = blockList[0];
-            blocks = head.mergeToSequentialBlocks(blockList);*/
-
-            final ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
-            blocks = forkJoinPool.invoke(new MergingTask(blockList));
-
-        } else {
-            blocks = new IPAddress[0];
-        }
-
-        LOG.info("Merged addresses to ranges.");
-        LOG.info("Merging to prefix blocks.");
-
-        final IPAddress[] prefixesAndBlocks = Arrays.stream(blocks)
-                .map(b -> b.mergeToPrefixBlocks(b))
-                .flatMap(Arrays::stream)
-                .toArray(IPAddress[]::new);
-
-        LOG.info("Merged to prefix blocks.");
-
-        final long stop = System.nanoTime();
-        LOG.info("Entries after merging: {}.", prefixesAndBlocks.length);
-        LOG.info("Merged in {} seconds.", () -> ((double) (stop - start)) / 1_000_000_000);
-        return prefixesAndBlocks;
+    public void dispose() {
+        final Dispatcher dispatcher = this.client.dispatcher();
+        dispatcher.cancelAll();
+        dispatcher.executorService().shutdownNow();
+        this.client.connectionPool().evictAll();
     }
 
-    private IPAddress[] getBlockList(final ResponseBody responseBody) throws IOException {
+    private List<String> getAddressStrings(final ResponseBody responseBody) throws IOException {
 
         if (responseBody == null) {
-            return new IPAddress[0];
+            return List.of();
         }
 
         LOG.info("Parsing raw addresses data from Antizapret.");
 
         try (final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(responseBody.byteStream()))) {
-
-            final IPAddress[] ipAddresses = bufferedReader.lines()
-                    .flatMap(l -> Arrays.stream(l.split(",")))
+            final List<String> addressStrings = bufferedReader.lines()
+                    .flatMap(l -> stream(l.split(",")))
                     .filter(Objects::nonNull)
                     .filter(i -> !i.isEmpty())
-                    .map(IPAddressString::new)
-                    .filter(IPAddressString::isIPv4)
-                    .map(IPAddressString::getAddress)
-                    .toArray(IPAddress[]::new);
+                    .collect(toList());
 
             LOG.info("Raw data has been parsed.");
 
-            return ipAddresses;
+            return addressStrings;
         }
     }
 }

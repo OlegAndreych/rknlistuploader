@@ -29,7 +29,8 @@ public class MikrotikConnector implements AutoCloseable {
     public List<Map<String, String>> getListContent(final String listName) throws MikrotikApiException {
         LOG.info("Getting \"{}\" list content.", listName);
         final List<Map<String, String>> list = this.connection.execute(format("/ip/firewall/address-list/print where list=%s", listName));
-        LOG.info("Got \"{}\" list content.", listName);
+        LOG.info("\"{}\" list content size is {} items.", listName, list.size());
+
         return list;
     }
 
@@ -39,14 +40,26 @@ public class MikrotikConnector implements AutoCloseable {
     }
 
     public void removeAddresses(final Collection<String> ids) throws MikrotikApiException {
+        final int size = ids.size();
+        int i = 0;
         for (final String id : ids) {
             this.connection.execute(format("/ip/firewall/address-list/remove .id=%s", id));
+            i++;
+            if (i % 1000 == 0) {
+                LOG.info("Removed {} out of {}.", i, size);
+            }
         }
     }
 
     public void addAddresses(final Collection<String> addresses, final String listName) throws MikrotikApiException {
+        final int size = addresses.size();
+        int i = 0;
         for (final String address : addresses) {
             this.connection.execute(format("/ip/firewall/address-list/add address=%s list=%s", address, listName));
+            i++;
+            if (i % 1000 == 0) {
+                LOG.info("Added {} out of {}.", i, size);
+            }
         }
     }
 }

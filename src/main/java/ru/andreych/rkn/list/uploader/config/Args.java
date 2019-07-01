@@ -7,66 +7,90 @@ public class Args {
     private String routerAddress = "192.168.1.1";
     @Parameter(names = {"--routerPort", "-p"}, description = "Router API port")
     private Integer port = 8728;
-    @Parameter(names = {"--login", "-l"}, description = "Router login")
-    private String login;
-    @Parameter(names = {"--password", "-pw"}, description = "Router password")
-    private String password;
     @Parameter(names = {"--listName", "-ln"}, description = "Address list name")
     private String listName = "rkn";
     @Parameter(names = {"--apiUri", "-u"}, description = "Antizapret API url")
     private String apiUrl = "http://api.antizapret.info/group.php";
     @Parameter(names = {"--mikrotikTimeout", "-mt"}, description = "Mikrotik synchronous command timeout")
     private int mikrotikTimeout = 300_000;
+    @Parameter(names = {"--apiConnTimeout", "-act"}, description = "Antizapret API connection timeout in milliseconds")
+    private Long antizapretConnectionTimeout = 300_000L;
+    @Parameter(names = {"--apiSockReadTimeout", "-asrt"}, description = "Antizapret API socket read timeout in milliseconds")
+    private Long antizapretConnectionSocketReadTimeout = 300_000L;
+    @Parameter(names = {"--apiSockWriteTimeout", "-aswt"}, description = "Antizapret API socket write timeout in milliseconds")
+    private Long antizapretConnectionSocketWriteTimeout = 300_000L;
+    @Parameter(names = {"--password", "-pw"}, description = "Router password")
+    private String password;
+    @Parameter(names = {"--login", "-l"}, description = "Router login")
+    private String login;
     @Parameter(names = {"-h", "--help"}, help = true, description = "Usage description")
     private boolean help;
+    @Parameter(names = {"-hp", "--hashPath"}, description = "Path to file with addresses hash")
+    private String hashFilePath = "/var/lib/rknlistuploader/hash";
+
+    public Long getAntizapretConnectionSocketReadTimeout() {
+        return this.antizapretConnectionSocketReadTimeout;
+    }
+
+    public Long getAntizapretConnectionSocketWriteTimeout() {
+        return this.antizapretConnectionSocketWriteTimeout;
+    }
 
     public boolean isHelp() {
-        return help;
+        return this.help;
     }
 
     public String getLogin() {
-        return login;
+        return this.login;
     }
 
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
 
     public String getRouterAddress() {
-        return routerAddress;
+        return this.routerAddress;
     }
 
 
     public Integer getPort() {
-        return port;
+        return this.port;
     }
 
 
     public String getListName() {
-        return listName;
+        return this.listName;
     }
 
 
     public String getApiUrl() {
-        return apiUrl;
+        return this.apiUrl;
     }
 
 
     @Override
     public String toString() {
         return "Args{" +
-                "routerAddress='" + routerAddress + '\'' +
-                ", port=" + port +
-                ", login='" + login + '\'' +
+                "routerAddress='" + this.routerAddress + '\'' +
+                ", port=" + this.port +
+                ", login='" + this.login + '\'' +
                 ", password='" + "***" + '\'' +
-                ", listName='" + listName + '\'' +
-                ", apiUrl='" + apiUrl + '\'' +
+                ", listName='" + this.listName + '\'' +
+                ", apiUrl='" + this.apiUrl + '\'' +
                 '}';
     }
 
     public int getMikrotikTimeout() {
-        return mikrotikTimeout;
+        return this.mikrotikTimeout;
+    }
+
+    public Long getAntizapretConnectionTimeout() {
+        return this.antizapretConnectionTimeout;
+    }
+
+    public String getHashFilePath() {
+        return this.hashFilePath;
     }
 }
